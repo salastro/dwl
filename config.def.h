@@ -9,6 +9,8 @@ static const float focuscolor[]            = {1.0, 0.0, 0.0, 1.0};
 /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
 
+#define TERMINAL "foot"
+
 /* autostart */
 static const char *const autostart[] = {
 	/* "wbg", "/path/to/your/image", NULL, */
@@ -25,7 +27,7 @@ static const Rule rules[] = {
 	{ "Gimp",     NULL,       0,            1,          0,      1,         -1 },
 	*/
 	{ "firefox",  NULL,       1 << 8,       0,          0,      1,         -1,      0   },
-	{ "foot",     NULL,       0,            0,          1,      0,         -1,      0   },
+	{ TERMINAL,   NULL,       0,            0,          1,      0,         -1,      0   },
 	{ "org.pwmt.zathura",NULL,0,            0,          0,      0,         -1,      0   },
 	{ NULL,     "scratchpad", 0,            1,          1,      0,         -1,      's' },
 };
@@ -121,11 +123,11 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *termcmd[] = { "foot", NULL };
+static const char *termcmd[] = { TERMINAL, NULL };
 static const char *menucmd[] = { "bemenu-run", NULL };
 
 /* named scratchpads - First arg only serves to match against key in rules*/
-static const char *scratchpadcmd[] = { "s", "foot", "-T", "scratchpad", NULL };
+static const char *scratchpadcmd[] = { "s", TERMINAL, "-T", "scratchpad", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
