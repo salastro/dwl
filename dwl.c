@@ -228,6 +228,7 @@ static void cleanup(void);
 static void cleanupkeyboard(struct wl_listener *listener, void *data);
 static void cleanupmon(struct wl_listener *listener, void *data);
 static void closemon(Monitor *m);
+static void column(Monitor *m);
 static void commitlayersurfacenotify(struct wl_listener *listener, void *data);
 static void commitnotify(struct wl_listener *listener, void *data);
 static void createdecoration(struct wl_listener *listener, void *data);
@@ -253,6 +254,7 @@ static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Client *focustop(Monitor *m);
 static void fullscreennotify(struct wl_listener *listener, void *data);
+static void gaplessgrid(Monitor *m);
 static void incnmaster(const Arg *arg);
 static void inputdevice(struct wl_listener *listener, void *data);
 static int keybinding(uint32_t mods, xkb_keysym_t sym);
@@ -722,6 +724,28 @@ closemon(Monitor *m)
 	}
 	focusclient(focustop(selmon), 1);
 	printstatus();
+}
+
+void
+column(Monitor *m)
+{
+	Client *c;
+	unsigned int n = 0, i = 0;
+
+	wl_list_for_each(c, &clients, link)
+		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
+			n++;
+
+	wl_list_for_each(c, &clients, link) {
+		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+			continue;
+		resize(c, (struct wlr_box){
+				.x = m->w.x + i * m->w.width / n,
+				.y = m->w.y,
+				.width = m->w.width / n,
+				.height = m->w.height}, 0);
+		i++;
+	}
 }
 
 void
@@ -1308,6 +1332,51 @@ fullscreennotify(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, fullscreen);
 	setfullscreen(c, client_wants_fullscreen(c));
+}
+
+void
+gaplessgrid(Monitor *m)
+{
+	unsigned int n = 0, i = 0, ch, cw, cn, rn, rows, cols;
+	Client *c;
+
+	wl_list_for_each(c, &clients, link)
+		if (VISIBLEON(c, m) && !c->isfloating)
+			n++;
+	if (n == 0)
+		return;
+
+	/* grid dimensions */
+	for (cols = 0; cols <= (n / 2); cols++)
+		if ((cols * cols) >= n)
+			break;
+
+	if (n == 5) /* set layout against the general calculation: not 1:2:2, but 2:3 */
+		cols = 2;
+	rows = n / cols;
+
+	/* window geometries */
+	cw = cols ? m->w.width / cols : m->w.width;
+	cn = 0; /* current column number */
+	rn = 0; /* current row number */
+	wl_list_for_each(c, &clients, link) {
+		unsigned int cx, cy;
+		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+			continue;
+
+		if ((i / rows + 1) > (cols - n % cols))
+			rows = n / cols + 1;
+		ch = rows ? m->w.height / rows : m->w.height;
+		cx = m->w.x + cn * cw;
+		cy = m->w.y + rn * ch;
+		resize(c, cx, cy, cw, ch, 0);
+		rn++;
+		if (rn >= rows) {
+			rn = 0;
+			cn++;
+		}
+		i++;
+	}
 }
 
 void
