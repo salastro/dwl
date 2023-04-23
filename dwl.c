@@ -1370,7 +1370,7 @@ gaplessgrid(Monitor *m)
 		ch = rows ? m->w.height / rows : m->w.height;
 		cx = m->w.x + cn * cw;
 		cy = m->w.y + rn * ch;
-		resize(c, cx, cy, cw, ch, 0);
+		resize(c, (struct wlr_box){.x = cx, .y = cy, .width = cw, .height = ch}, 0);
 		rn++;
 		if (rn >= rows) {
 			rn = 0;
@@ -2969,11 +2969,11 @@ bstack(Monitor *m)
 			continue;
 		if (i < m->nmaster) {
 			w = (m->w.width - mx) / (MIN(n, m->nmaster) - i);
-			resize(c, m->w.x + mx, m->w.y, w - (2 * c->bw), mh - (2 * c->bw), 0);
+			resize(c, (struct wlr_box){.x = m->w.x + mx, .y = m->w.y, .width = w - (2 * c->bw), .height = mh - (2 * c->bw)}, 0);
 			mx += c->geom.width;
 		} else {
 			h = m->w.height - mh;
-			resize(c, tx, ty, tw - (2 * c->bw), h - (2 * c->bw), 0);
+			resize(c, (struct wlr_box) {.x = tx, .y = ty, .width = tw - (2 * c->bw), .height = h - (2 * c->bw) }, 0);
 			if (tw != m->w.width)
 				tx += c->geom.width;
 		}
@@ -3009,10 +3009,10 @@ bstackhoriz(Monitor *m) {
 			continue;
 		if (i < m->nmaster) {
 			w = (m->w.width - mx) / (MIN(n, m->nmaster) - i);
-			resize(c, m->w.x + mx, m->w.y, w - (2 * c->bw), mh - (2 * c->bw), 0);
+			resize(c, (struct wlr_box) {.x = m->w.x + mx, .y = m->w.y, .width = w - (2 * c->bw), .height = mh - (2 * c->bw) }, 0);
 			mx += c->geom.width;
 		} else {
-			resize(c, tx, ty, m->w.width - (2 * c->bw), th - (2 * c->bw), 0);
+			resize(c, (struct wlr_box) {.x = tx, .y = ty, .width = m->w.width - (2 * c->bw), .height = th - (2 * c->bw) }, 0);
 			if (th != m->w.height)
 				ty += c->geom.height;
 		}
