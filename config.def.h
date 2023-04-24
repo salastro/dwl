@@ -14,7 +14,6 @@ static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
 /* autostart */
 static const char *const autostart[] = {
 	/* "wbg", "/path/to/your/image", NULL, */
-	"waybar", NULL,
 	NULL /* terminate */
 };
 
