@@ -35,7 +35,7 @@ wlr-layer-shell-unstable-v1-protocol.h:
 config.h:
 	cp config.def.h $@
 clean:
-	rm -f dwl *.o *-protocol.h
+	rm -f dwl *.o *-protocol.h *.rej *.orig
 
 dist: clean
 	mkdir -p dwl-$(VERSION)
