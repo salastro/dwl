@@ -71,6 +71,11 @@ static const int capslock = 0;
 static const int repeat_rate = 25;
 static const int repeat_delay = 600;
 
+/* gb will be set the first time togglekblayout is called, then us.. it is
+ * recommended to set the same layout in position 0 of kblayouts and in
+ * xkb_rules */
+static const char *kblayouts[] = {"us", "ara"};
+
 /* Trackpad */
 static const int tap_to_click = 1;
 static const int tap_and_drag = 1;
@@ -122,10 +127,13 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 	{ MODKEY|WLR_MODIFIER_SHIFT, SKEY,           tag,             {.ui = 1 << TAG} }, \
 	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,SKEY,toggletag, {.ui = 1 << TAG} }
 
-/* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+/* /1* helper for spawning shell commands in the pre dwm-5.0 fashion *1/ */
+/* #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } } */
 
 /* commands */
+static const char *upvol[] = { "pulsemixer", "--change-volume", "+2", NULL };
+static const char *downvol[] = { "pulsemixer", "--change-volume", "-2", NULL };
+static const char *mute[] = { "pulsemixer", "--toggle-mute", NULL };
 static const char *termcmd[] = { TERMINAL, NULL };
 static const char *menucmd[] = { "bemenu-run", NULL };
 
@@ -171,6 +179,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_space,      togglekblayout, {0} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
@@ -187,6 +196,10 @@ static const Key keys[] = {
 #define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_XF86Switch_VT_##n, chvt, {.ui = (n)} }
 	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),
 	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
+
+	{ 0, XF86XK_AudioRaiseVolume, spawn, {.v = upvol } },
+	{ 0, XF86XK_AudioLowerVolume, spawn, {.v = downvol } },
+	{ 0, XF86XK_AudioMute,        spawn, {.v = mute } },
 };
 
 static const Button buttons[] = {
